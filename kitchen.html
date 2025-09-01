@@ -2,30 +2,25 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>حساب الخزائن والحلق مع جدول النتائج</title>
+<title>حاسبة الخزائن والحلق السفلي</title>
 <style>
 body { font-family: "Tahoma", sans-serif; direction: rtl; margin: 20px; }
 h2 { color: #333; }
-.container { display: flex; gap: 20px; flex-wrap: wrap; }
-.section { border: 1px solid #aaa; padding: 15px; border-radius: 8px; width: 48%; min-width: 300px;}
+.container { display: flex; gap: 20px; }
+.section { border: 1px solid #aaa; padding: 15px; border-radius: 8px; width: 48%; }
 label { display: block; margin-top: 10px; }
-input { width: 100px; margin-top: 5px; }
-button { margin-top: 10px; padding: 5px 15px; cursor: pointer; }
-.results { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; overflow-x:auto; }
-table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-th, td { border: 1px solid #aaa; padding: 6px; text-align: center; }
-th { background: #f0f0f0; }
-.divider-row { display: flex; gap: 5px; align-items: center; margin-top:5px; }
-.divider-row input, .divider-row select { width: 60px; }
-.remove-btn { background:#e03131;color:#fff;border:0;border-radius:4px;padding:2px 6px;cursor:pointer; }
+input, select { margin-top: 5px; width: 100px; }
+button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
+.results { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; }
+.item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc; }
+.divider-row { display:flex; gap:5px; margin-top:5px; align-items:center;}
 </style>
 </head>
 <body>
 
-<h2>📐 برنامج حساب الخزائن والحلق مع جدول النتائج</h2>
+<h2>📐 برنامج حساب الخزائن والحلق السفلي</h2>
 
 <div class="container">
-  <!-- خزانة -->
   <div class="section">
     <h3>➕ إضافة خزانة</h3>
     <label>العرض (سم): <input type="number" id="cabWidth"></label>
@@ -40,147 +35,126 @@ th { background: #f0f0f0; }
     <button onclick="addCabinet()">إضافة خزانة</button>
   </div>
 
-  <!-- حلق -->
   <div class="section">
     <h3>➕ إضافة حلق سفلي</h3>
     <label>العرض (سم): <input type="number" id="frameWidth"></label>
     <label>الارتفاع (سم): <input type="number" id="frameHeight"></label>
-    <div id="dividersContainer"></div>
-    <button onclick="addDivider()">➕ إضافة قاطع</button>
+    <div id="dividerContainer"></div>
+    <button onclick="addDividerRow()">➕ إضافة قاطع</button>
     <button onclick="addFrame()">إضافة حلق</button>
   </div>
 </div>
 
 <div class="results" id="results">
-  <h3>📊 النتائج:</h3>
+<h3>📊 النتائج:</h3>
 </div>
 
-<div style="margin-top: 15px;">
-  <button onclick="showSummary()">📝 عرض الملخص النهائي</button>
-  <button onclick="window.print()">🖨️ طباعة النتائج</button>
-</div>
+<button onclick="printResults()">🖨️ طباعة النتائج</button>
 
 <script>
 let resultsDiv = document.getElementById("results");
-let summary = {doors:0, hinges:0, handles:0, corners:0};
-let dividerIndex = 0;
 
-// إضافة خزانة
+// الخزائن
 function addCabinet() {
   let wMain = parseFloat(document.getElementById("cabWidth").value);
   let hMain = parseFloat(document.getElementById("cabHeight").value);
   let dMain = parseFloat(document.getElementById("cabDepth").value);
   let doors = parseInt(document.getElementById("cabDoors").value);
 
-  if (wMain<=0 || hMain<=0 || dMain<=0){ alert("❌ أدخل قياسات صحيحة للخزانة"); return; }
+  if(wMain<=0||hMain<=0||dMain<=0){ alert("❌ أدخل قياسات صحيحة للخزانة"); return; }
 
-  let w = wMain - 5, h = hMain -5, d = dMain -5;
-  let cabCorners=0;
-  let doorRows = [];
-  if(doors===1){
-    let doorW = wMain -3, doorH = hMain -2.5;
-    doorRows.push({width:doorW,height:doorH,doors:1,hinges:2,handles:1,corners:4});
-    cabCorners=4;
-  } else {
-    let doorW = (wMain -4)/2, doorH = hMain -2.5;
-    doorRows.push({width:doorW,height:doorH,doors:2,hinges:4,handles:2,corners:8});
-    cabCorners=8;
-  }
+  let w = wMain-5, h = hMain-5, d = dMain-5;
+  let item=document.createElement("div"); item.className="item";
 
-  summary.doors += doorRows.reduce((s,r)=>s+r.doors,0);
-  summary.hinges += doorRows.reduce((s,r)=>s+r.hinges,0);
-  summary.handles += doorRows.reduce((s,r)=>s+r.handles,0);
-  summary.corners += cabCorners;
+  let doorHeight = (doors===1)?hMain-2.5:hMain-2.5;
+  let doorWidth = (doors===1)?wMain-3:(wMain-4)/2;
+  let doorCount=(doors===1)?2:4;
+  let hinges = doorCount*2;
+  let handles = doorCount;
+  let angles = doorCount*4;
+  let doorDesc = (doors===1)?
+    `باب واحد: ${doorWidth} × ${doorHeight} سم — فصالات 2 / يد 1 — عدد كل قياس: عرض ${doorCount} × ارتفاع ${doorCount}`:
+    `بابان: ${doorWidth} × ${doorHeight} سم لكل باب — فصالات 2 / يد 1 لكل باب — عدد كل قياس: عرض 4 × ارتفاع 4`;
 
-  let table = `<table>
-  <tr><th colspan="2">🗄️ خزانة</th></tr>
-  <tr><td>البروفيلات</td><td>
-    ارتفاع: 2×${h} (بسنين) + 2×${h} (بسن واحد)<br>
-    عرض: 2×${w} (بسنين) + 2×${w} (بسن واحد)<br>
-    عمق: 4×${d} (بسنين)
-  </td></tr>
-  <tr><th>الأبواب</th><th>القياسات / عدد الفصالات / الأيدي / الزوايا</th></tr>`;
-
-  doorRows.forEach((r,i)=>{
-    table+=`<tr><td>باب ${i+1}</td><td>${r.width}×${r.height} — فصالات ${r.hinges} / يد ${r.handles} — زوايا ${r.corners}</td></tr>`;
-  });
-
-  table+=`</table>`;
-  resultsDiv.innerHTML += table;
+  item.innerHTML = `
+    <h4>🗄️ خزانة</h4>
+    الأبعاد بعد خصم البروفيلات: عرض ${w} × ارتفاع ${h} × عمق ${d}<br>
+    <b>تفاصيل البروفيلات:</b><br>
+    - ارتفاع: 2 × ${h} سم (بسنين) + 2 × ${h} سم (بسن واحد)<br>
+    - عرض: 2 × ${w} سم (بسنين) + 2 × ${w} سم (بسن واحد)<br>
+    - عمق: 4 × ${d} سم (بسنين)<br>
+    <b>تفاصيل الأبواب:</b><br>${doorDesc}<br>
+    <div>عدد الزوايا لكل خزانة: 8</div>
+    <div>ملخص: الأبواب ${doorCount} — الفصالات ${hinges} — الأيدي ${handles} — الزوايا ${angles}</div>
+  `;
+  resultsDiv.appendChild(item);
 }
 
-// إضافة قاطع
-function addDivider() {
-  dividerIndex++;
-  const container = document.getElementById("dividersContainer");
-  const row = document.createElement("div");
-  row.className="divider-row";
-  row.dataset.index=dividerIndex;
-  row.innerHTML = `
-    مسافة (سم): <input type="number" class="dividerDistance" value="0">
-    عدد أبواب: <select class="dividerDoors"><option value="1">1</option><option value="2">2</option></select>
-    <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+// الحلقات
+let dividerData = [];
+function addDividerRow(){
+  let container=document.getElementById("dividerContainer");
+  let row=document.createElement("div"); row.className="divider-row";
+  row.innerHTML=`
+    <input type="number" placeholder="مسافة القاطع من البداية" class="divPos">
+    <select class="divDoors">
+      <option value="1">1 باب</option>
+      <option value="2">2 باب</option>
+    </select>
+    <button onclick="this.parentElement.remove()">× حذف</button>
   `;
   container.appendChild(row);
 }
 
 // إضافة حلق
-function addFrame() {
-  let w = parseFloat(document.getElementById("frameWidth").value);
-  let h = parseFloat(document.getElementById("frameHeight").value);
-  if(w<=0||h<=0){alert("❌ أدخل قياسات صحيحة للحلق"); return;}
+function addFrame(){
+  let w=parseFloat(document.getElementById("frameWidth").value);
+  let h=parseFloat(document.getElementById("frameHeight").value);
+  if(w<=0||h<=0){ alert("❌ أدخل قياسات صحيحة"); return; }
 
-  const divRows = Array.from(document.querySelectorAll("#dividersContainer .divider-row"));
-  const N = divRows.length;
-  const innerAvailable = w - N*2.7; // خصم عرض القواطع
-  let distances = divRows.map(r=>parseFloat(r.querySelector(".dividerDistance").value)||0);
-  let distancesSum = distances.reduce((s,x)=>s+x,0);
+  // جمع بيانات القواطع
+  let rows=document.querySelectorAll(".divider-row");
+  let dividers=[];
+  rows.forEach(r=>{
+    let pos=parseFloat(r.querySelector(".divPos").value);
+    let doors=parseInt(r.querySelector(".divDoors").value);
+    if(!isNaN(pos)&&pos>0) dividers.push({position:pos, doors:doors});
+  });
+  dividers.sort((a,b)=>a.position-b.position);
 
-  let table = `<table><tr><th colspan="2">🚪 حلق سفلي</th></tr>
-               <tr><td>الأبعاد</td><td>عرض ${w} × ارتفاع ${h}</td></tr>
-               <tr><th>المقطع</th><th>قياسات / فصالات / الأيدي / الزوايا</th></tr>`;
+  let item=document.createElement("div"); item.className="item";
+  let lastPos=0; let sectionDetails=""; let doorHeight=h-2.5;
+  dividers.forEach((d,i)=>{
+    let sectionWidth=d.position-lastPos-(i>0?2.7:0);
+    sectionDetails+=`المقطع ${i+1}: عرض ${sectionWidth.toFixed(1)} سم × ارتفاع ${doorHeight.toFixed(1)} سم — ${d.doors} باب(أبواب)<br>`;
+    lastPos=d.position;
+  });
+  // المقطع الأخير بعد آخر قاطع
+  let remainingWidth=w-lastPos-(dividers.length>0?2.7:0);
+  sectionDetails+=`المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} سم × ارتفاع ${doorHeight.toFixed(1)} سم — 1 باب<br>`;
 
-  if(distancesSum>innerAvailable){
-    table+=`<tr><td colspan="2" style="color:red">خطأ: مجموع مسافات القواطع (${distancesSum}) أكبر من المساحة الداخلية المتاحة (${innerAvailable})</td></tr>`;
-  } else {
-    const segments = distances.slice();
-    segments.push(innerAvailable - distancesSum);
-    segments.forEach((segWidth,idx)=>{
-      const doorsCount = (idx<divRows.length)?parseInt(divRows[idx].querySelector(".dividerDoors").value):1;
-      let doorW = (doorsCount===1)?segWidth-3:(segWidth-0)/doorsCount-2.5;
-      let doorH = h-2.5;
-      let corners = doorsCount===1?4:8;
-      let hinges = doorsCount===1?2:4;
-      let handles = doorsCount===1?1:2;
+  // ملخص القواطع
+  let summary="عدد القواطع: "+dividers.length+" — ";
+  summary+="مسافات القواطع: ["+dividers.map(d=>d.position).join(", ")+"] — ";
+  summary+="عدد أبواب كل مقطع: ["+dividers.map(d=>d.doors).join(", ")+"]";
 
-      summary.doors += doorsCount;
-      summary.hinges += hinges;
-      summary.handles += handles;
-      summary.corners += corners;
-
-      table+=`<tr><td>المقطع ${idx+1}</td><td>${doorW.toFixed(2)} × ${doorH} — فصالات ${hinges} / يد ${handles} — زوايا ${corners}</td></tr>`;
-    });
-  }
-
-  table+=`</table>`;
-  resultsDiv.innerHTML += table;
-
-  document.getElementById("dividersContainer").innerHTML="";
-  dividerIndex=0;
+  item.innerHTML=`
+    <h4>🚪 حلق سفلي</h4>
+    الأبعاد: عرض ${w} × ارتفاع ${h}<br>
+    <b>تفاصيل المقاطع:</b><br>${sectionDetails}
+    <div>${summary}</div>
+  `;
+  resultsDiv.appendChild(item);
+  document.getElementById("dividerContainer").innerHTML=""; // إعادة ضبط القواطع
 }
 
-// الملخص النهائي
-function showSummary(){
-  let table = `<table>
-  <tr><th>ملخص</th><th>القيمة</th></tr>
-  <tr><td>مجموع الأبواب</td><td>${summary.doors}</td></tr>
-  <tr><td>مجموع الفصالات</td><td>${summary.hinges}</td></tr>
-  <tr><td>مجموع الأيدي</td><td>${summary.handles}</td></tr>
-  <tr><td>مجموع الزوايا</td><td>${summary.corners}</td></tr>
-  </table>`;
-  resultsDiv.innerHTML += table;
+// طباعة النتائج فقط
+function printResults(){
+  let content=document.getElementById("results").innerHTML;
+  let myWindow=window.open("","Print","width=800,height=600");
+  myWindow.document.write("<html><head><title>نتائج الطباعة</title></head><body>"+content+"</body></html>");
+  myWindow.document.close(); myWindow.print();
 }
 </script>
-
 </body>
 </html>
