@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>حاسبة الخزائن والحلق السفلي مع الميلامين</title>
+<title>حاسبة الخزائن والحلق السفلي</title>
 <style>
-body { font-family: "Tahoma", sans-serif; margin: 20px; }
+body { font-family: "Tahoma", sans-serif; direction: rtl; margin: 20px; }
 h2 { color: #333; }
 .container { display: flex; gap: 20px; flex-wrap: wrap; }
-.section { border: 1px solid #aaa; padding: 15px; border-radius: 8px; width: 48%; min-width: 300px; }
+.section { border: 1px solid #aaa; padding: 15px; border-radius: 8px; width: 48%; }
 label { display: block; margin-top: 10px; }
 input, select { margin-top: 5px; width: 100px; }
 button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
@@ -18,7 +18,7 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
 </head>
 <body>
 
-<h2>📐 برنامج حساب الخزائن والحلق السفلي مع الميلامين</h2>
+<h2>📐 برنامج حساب الخزائن والحلق السفلي</h2>
 
 <div class="container">
   <div class="section">
@@ -52,27 +52,16 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
 <button onclick="printResults()">🖨️ طباعة النتائج</button>
 
 <script>
-const MELAMINE_DEDUCT = 5.2; // خصم الميلامين
-
 let resultsDiv = document.getElementById("results");
 
-// الخزائن
+// الخزائن (كما هي)
 function addCabinet() {
   let wMain = parseFloat(document.getElementById("cabWidth").value);
   let hMain = parseFloat(document.getElementById("cabHeight").value);
   let dMain = parseFloat(document.getElementById("cabDepth").value);
   let doors = parseInt(document.getElementById("cabDoors").value);
-
   if(wMain<=0||hMain<=0||dMain<=0){ alert("❌ أدخل قياسات صحيحة للخزانة"); return; }
-
-  // أبعاد البروفيلات
-  let wProfile=wMain-5, hProfile=hMain-5, dProfile=dMain-5;
-
-  // الميلامين
-  let wMelamine = wMain - MELAMINE_DEDUCT;
-  let hMelamine = hMain - MELAMINE_DEDUCT;
-  let dMelamine = dMain - MELAMINE_DEDUCT;
-
+  let w = wMain-5, h = hMain-5, d = dMain-5;
   let item=document.createElement("div"); item.className="item";
 
   // الأبواب
@@ -81,50 +70,38 @@ function addCabinet() {
   let doorCount=(doors===1)?2:4;
   let hinges = doorCount*2;
   let handles = doorCount;
-  let anglesCab = 8;
-  let anglesDoor = doorCount*4;
-
+  let angles = doorCount*4;
   let doorDesc = (doors===1)?
     `باب واحد: ${doorWidth} × ${doorHeight} سم — فصالات 2 / يد 1 — عدد كل قياس: عرض ${doorCount} × ارتفاع ${doorCount}`:
     `بابان: ${doorWidth} × ${doorHeight} سم لكل باب — فصالات 2 / يد 1 لكل باب — عدد كل قياس: عرض 4 × ارتفاع 4`;
 
-  // الميلامين للخزانة
+  // الميلامين
   let melamineDesc = `
-    <b>ميلامين الخزانة (خصم 5.2 سم):</b><br>
-    عدد: 2 قطع × ${wMelamine.toFixed(1)} × ${dMelamine.toFixed(1)} سم<br>
-    عدد: 2 قطع × ${hMelamine.toFixed(1)} × ${dMelamine.toFixed(1)} سم<br>
-    عدد: 1 قطعة × ${wMelamine.toFixed(1)} × ${hMelamine.toFixed(1)} سم
+    <b>ميلامين الخزانة:</b><br>
+    -  2 قطعة<br>
+    -  2 قطعة<br>
+    -  1 قطعة<br>
+    (خصم 5.2 سم من القياس الرئيسي)<br>
+    <b>ميلامين الأبواب:</b> خصم 11 سم من كل باب
   `;
-
-  // الميلامين للأبواب
-  let melamineDoorWidth = doorWidth - 11;
-  let melamineDoorHeight = doorHeight - 11;
-  let melamineDoorDesc = `ميلامين الباب: ${melamineDoorWidth.toFixed(1)} × ${melamineDoorHeight.toFixed(1)} سم لكل باب`;
 
   item.innerHTML = `
     <h4>🗄️ خزانة</h4>
-    الأبعاد بعد خصم البروفيلات: عرض ${wProfile} × ارتفاع ${hProfile} × عمق ${dProfile}<br>
-    <b>تفاصيل البروفيلات:</b><br>
-    - ارتفاع: 2 × ${hProfile} سم (بسنين) + 2 × ${hProfile} سم (بسن واحد)<br>
-    - عرض: 2 × ${wProfile} سم (بسنين) + 2 × ${wProfile} سم (بسن واحد)<br>
-    - عمق: 4 × ${dProfile} سم (بسنين)<br>
-    <b>تفاصيل الأبواب:</b><br>${doorDesc}<br>
+    الأبعاد بعد خصم البروفيلات: عرض ${w} × ارتفاع ${h} × عمق ${d}<br>
     ${melamineDesc}<br>
-    ${melamineDoorDesc}<br>
+    <b>تفاصيل الأبواب:</b><br>${doorDesc}<br>
     <div>عدد الزوايا لكل خزانة: 8</div>
-    <div>عدد الزوايا لكل باب: 4</div>
-    <div>ملخص: الأبواب ${doorCount} — الفصالات ${hinges} — الأيدي ${handles} — الزوايا خزانة ${anglesCab} / أبواب ${anglesDoor}</div>
+    <div>ملخص: الأبواب ${doorCount} — الفصالات ${hinges} — الأيدي ${handles} — الزوايا ${angles}</div>
   `;
-
   resultsDiv.appendChild(item);
 }
 
-// الحلقات السفلي
+// الحلقات
 function addDividerRow(){
   let container=document.getElementById("dividerContainer");
   let row=document.createElement("div"); row.className="divider-row";
   row.innerHTML=`
-    <input type="number" placeholder="مسافة القاطع من البداية" class="divPos">
+    <input type="number" placeholder="مسافة القاطع من اليمين" class="divPos">
     <select class="divDoors">
       <option value="1">1 باب</option>
       <option value="2">2 باب</option>
@@ -151,42 +128,26 @@ function addFrame(){
   let item=document.createElement("div"); item.className="item";
   let lastPos=0; let sectionDetails=""; let doorHeight=h-2.5;
 
+  // المقاطع من اليمين لليسار
   dividers.forEach((d,i)=>{
-    let sectionWidth=d.position-lastPos-(i>0?2.7:0);
-    // حساب ابعاد الابواب بناءً على المعادلة
-    let doorWidth = (d.doors===1)?sectionWidth-3:(sectionWidth-4)/2;
-    let doorH = doorHeight;
-    sectionDetails+=`المقطع ${i+1}: عرض ${sectionWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} — أبواب ${d.doors} — عرض الباب ${doorWidth.toFixed(1)} × ارتفاع الباب ${doorH.toFixed(1)}<br>`;
+    let segWidth = d.position - lastPos - (i>0?2.7:0);
+    let doorsCount = d.doors;
+    let doorInfo="";
+    if(doorsCount===1){
+      let dw = segWidth - 3;
+      doorInfo=`باب واحد: ${dw.toFixed(2)} × ${doorHeight.toFixed(2)} سم — فصالات 2 / يد 1 — زوايا 4`;
+    } else {
+      let dw = (segWidth - 4)/2;
+      doorInfo=`بابان: ${dw.toFixed(2)} × ${doorHeight.toFixed(2)} سم لكل باب — فصالات 2 / يد 1 لكل باب — زوايا 4 لكل باب`;
+    }
+    sectionDetails+=`المقطع ${i+1}: عرض ${segWidth.toFixed(2)} سم × ارتفاع ${doorHeight.toFixed(2)} سم — ${doorInfo}<br>`;
     lastPos=d.position;
   });
 
   // المقطع الأخير بعد آخر قاطع
-  let remainingWidth=w-lastPos-(dividers.length>0?2.7:0);
-  let lastDoors = 1; // نسمح بتحديده لاحقًا اذا أحببت
-  let lastDoorWidth = (lastDoors===1)?remainingWidth-3:(remainingWidth-4)/2;
-  sectionDetails+=`المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} — أبواب ${lastDoors} — عرض الباب ${lastDoorWidth.toFixed(1)} × ارتفاع الباب ${doorHeight.toFixed(1)}<br>`;
-
-  let summary="عدد القواطع: "+dividers.length+" — ";
-  summary+="مسافات القواطع: ["+dividers.map(d=>d.position).join(", ")+"] — ";
-  summary+="عدد أبواب كل مقطع: ["+dividers.map(d=>d.doors).join(", ")+", "+lastDoors+"]";
-
-  item.innerHTML=`
-    <h4>🚪 حلق سفلي</h4>
-    الأبعاد: عرض ${w} × ارتفاع ${h}<br>
-    <b>تفاصيل المقاطع:</b><br>${sectionDetails}
-    <div>${summary}</div>
-  `;
-  resultsDiv.appendChild(item);
-  document.getElementById("dividerContainer").innerHTML="";
-}
-
-// طباعة النتائج فقط
-function printResults(){
-  let content=document.getElementById("results").innerHTML;
-  let myWindow=window.open("","Print","width=800,height=600");
-  myWindow.document.write("<html><head><title>نتائج الطباعة</title></head><body>"+content+"</body></html>");
-  myWindow.document.close(); myWindow.print();
-}
-</script>
-</body>
-</html>
+  let remainingWidth = w - lastPos - (dividers.length>0?2.7:0);
+  let lastDoors = parseInt(prompt("عدد أبواب المقطع الأخير؟ (1 أو 2)","1"))||1;
+  let doorInfo="";
+  if(lastDoors===1){
+    let dw = remainingWidth - 3;
+    doorInfo=`باب واحد: ${dw.toFixed(2)} × ${
