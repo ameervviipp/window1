@@ -41,6 +41,12 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
     <label>الارتفاع (سم): <input type="number" id="frameHeight"></label>
     <div id="dividerContainer"></div>
     <button onclick="addDividerRow()">➕ إضافة قاطع</button>
+    <label>عدد أبواب المقطع الأخير:
+      <select id="lastSectionDoors">
+        <option value="1">1 باب</option>
+        <option value="2">2 باب</option>
+      </select>
+    </label>
     <button onclick="addFrame()">إضافة حلق</button>
   </div>
 </div>
@@ -65,7 +71,6 @@ function addCabinet() {
   let w = wMain-5, h = hMain-5, d = dMain-5;
   let item=document.createElement("div"); item.className="item";
 
-  // الأبواب
   let doorHeight = hMain-2.5;
   let doorWidth = (doors===1)?wMain-3:(wMain-4)/2;
   let doorCount=(doors===1)?2:4;
@@ -74,7 +79,6 @@ function addCabinet() {
     `باب واحد: ${doorWidth} × ${doorHeight} سم — فصالات 2 / يد 1 — عدد كل قياس: عرض ${doorCount} × ارتفاع ${doorCount} — 4 زوايا لكل باب`:
     `بابان: ${doorWidth} × ${doorHeight} سم لكل باب — فصالات 2 / يد 1 لكل باب — عدد كل قياس: عرض 4 × ارتفاع 4 — 4 زوايا لكل باب`;
 
-  // الميلامين
   let melamineCab = `
 <b>ميلامين الخزانة:</b><br>
 - قطعة 1 (عدد 2): ${(w-5.2).toFixed(1)} × ${(d-5.2).toFixed(1)} سم<br>
@@ -125,6 +129,8 @@ function addFrame(){
   let h=parseFloat(document.getElementById("frameHeight").value);
   if(w<=0||h<=0){ alert("❌ أدخل قياسات صحيحة"); return; }
 
+  let lastDoors = parseInt(document.getElementById("lastSectionDoors").value);
+
   let rows=document.querySelectorAll(".divider-row");
   let dividers=[];
   rows.forEach(r=>{
@@ -145,7 +151,6 @@ function addFrame(){
   });
 
   let remainingWidth = w-lastPos-(dividers.length>0?2.7:0);
-  let lastDoors = 1;
   let lastDoorWidth = (lastDoors===1)?remainingWidth-3:(remainingWidth-4)/2;
   sectionDetails += `المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم — ${lastDoors} باب(أبواب) — أبعاد الميلامين لكل باب: عرض ${(lastDoorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم — فصالات 2 / يد 1 — 4 زوايا لكل باب<br>`;
 
