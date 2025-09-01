@@ -6,7 +6,7 @@
 <style>
 body { font-family: "Tahoma", sans-serif; direction: rtl; margin: 20px; }
 h2 { color: #333; }
-.container { display: flex; gap: 20px; flex-wrap: wrap; }
+.container { display: flex; gap: 20px; }
 .section { border: 1px solid #aaa; padding: 15px; border-radius: 8px; width: 48%; }
 label { display: block; margin-top: 10px; }
 input, select { margin-top: 5px; width: 100px; }
@@ -18,9 +18,10 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
 </head>
 <body>
 
-<h2>📐 برنامج حساب الخزائن والحلق السفلي مع الميلامين والأدوات</h2>
+<h2>📐 برنامج حساب الخزائن والحلق السفلي</h2>
 
 <div class="container">
+  <!-- خزانة -->
   <div class="section">
     <h3>➕ إضافة خزانة</h3>
     <label>العرض (سم): <input type="number" id="cabWidth"></label>
@@ -35,18 +36,19 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
     <button onclick="addCabinet()">إضافة خزانة</button>
   </div>
 
+  <!-- حلق -->
   <div class="section">
     <h3>➕ إضافة حلق سفلي</h3>
     <label>العرض (سم): <input type="number" id="frameWidth"></label>
     <label>الارتفاع (سم): <input type="number" id="frameHeight"></label>
     <div id="dividerContainer"></div>
-    <button onclick="addDividerRow()">➕ إضافة قاطع</button>
-    <label>عدد أبواب المقطع الأخير:
+    <label>عدد أبواب المقطع الأخير: 
       <select id="lastSectionDoors">
         <option value="1">1 باب</option>
         <option value="2">2 باب</option>
       </select>
     </label>
+    <button onclick="addDividerRow()">➕ إضافة قاطع</button>
     <button onclick="addFrame()">إضافة حلق</button>
   </div>
 </div>
@@ -66,45 +68,43 @@ function addCabinet() {
   let hMain = parseFloat(document.getElementById("cabHeight").value);
   let dMain = parseFloat(document.getElementById("cabDepth").value);
   let doors = parseInt(document.getElementById("cabDoors").value);
+
   if(wMain<=0||hMain<=0||dMain<=0){ alert("❌ أدخل قياسات صحيحة للخزانة"); return; }
 
-  let w = wMain-5, h = hMain-5, d = dMain-5;
+  let w = wMain-5.2, h = hMain-5.2, d = dMain-5.2;
   let item=document.createElement("div"); item.className="item";
 
   let doorHeight = hMain-2.5;
   let doorWidth = (doors===1)?wMain-3:(wMain-4)/2;
   let doorCount=(doors===1)?2:4;
-
+  let hinges = doorCount*2;
+  let handles = doorCount;
+  let angles = doorCount*4;
   let doorDesc = (doors===1)?
-    `باب واحد: ${doorWidth} × ${doorHeight} سم — فصالات 2 / يد 1 — عدد كل قياس: عرض ${doorCount} × ارتفاع ${doorCount} — 4 زوايا لكل باب`:
-    `بابان: ${doorWidth} × ${doorHeight} سم لكل باب — فصالات 2 / يد 1 لكل باب — عدد كل قياس: عرض 4 × ارتفاع 4 — 4 زوايا لكل باب`;
+    `باب واحد: ${doorWidth} × ${doorHeight} سم — فصالات 2 / يد 1 — عدد كل قياس: عرض ${doorCount} × ارتفاع ${doorCount}`:
+    `بابان: ${doorWidth} × ${doorHeight} سم لكل باب — فصالات 2 / يد 1 لكل باب — عدد كل قياس: عرض 4 × ارتفاع 4`;
 
-  let melamineCab = `
+  // الميلامين
+  let melamineDesc = `
 <b>ميلامين الخزانة:</b><br>
-- قطعة 1 (عدد 2): ${(w-5.2).toFixed(1)} × ${(d-5.2).toFixed(1)} سم<br>
-- قطعة 2 (عدد 2): ${(h-5.2).toFixed(1)} × ${(d-5.2).toFixed(1)} سم<br>
-- قطعة 3 (عدد 1): ${(w-5.2).toFixed(1)} × ${(h-5.2).toFixed(1)} سم
+- عدد ×2: ${(w-5.2).toFixed(1)} × ${(d-5.2).toFixed(1)}<br>
+- عدد ×2: ${(h-5.2).toFixed(1)} × ${(d-5.2).toFixed(1)}<br>
+- عدد ×1: ${(w-5.2).toFixed(1)} × ${(h-5.2).toFixed(1)}<br>
+<b>ميلامين الأبواب:</b><br>
+- لكل باب خصم 11 سم: عرض ${(doorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)}
 `;
-
-  let melamineDoor = `<b>ميلامين الأبواب:</b><br>`;
-  if(doors===1){
-    melamineDoor += `باب واحد: عرض ${(doorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم`;
-  } else {
-    melamineDoor += `بابان: عرض ${(doorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم لكل باب`;
-  }
 
   item.innerHTML = `
     <h4>🗄️ خزانة</h4>
-    الأبعاد بعد خصم البروفيلات: عرض ${w} × ارتفاع ${h} × عمق ${d}<br>
+    الأبعاد بعد خصم البروفيلات: عرض ${w.toFixed(1)} × ارتفاع ${h.toFixed(1)} × عمق ${d.toFixed(1)}<br>
     <b>تفاصيل البروفيلات:</b><br>
-    - ارتفاع: 2 × ${h} سم (بسنين) + 2 × ${h} سم (بسن واحد)<br>
-    - عرض: 2 × ${w} سم (بسنين) + 2 × ${w} سم (بسن واحد)<br>
-    - عمق: 4 × ${d} سم (بسنين)<br>
+    - ارتفاع: 2 × ${h.toFixed(1)} سم (بسنين) + 2 × ${h.toFixed(1)} سم (بسن واحد)<br>
+    - عرض: 2 × ${w.toFixed(1)} سم (بسنين) + 2 × ${w.toFixed(1)} سم (بسن واحد)<br>
+    - عمق: 4 × ${d.toFixed(1)} سم (بسنين)<br>
     <b>تفاصيل الأبواب:</b><br>${doorDesc}<br>
-    ${melamineCab}<br>
-    ${melamineDoor}<br>
+    ${melamineDesc}<br>
     <div>عدد الزوايا لكل خزانة: 8</div>
-    <div>ملخص الأدوات: الأبواب ${doorCount} — فصالات ${doorCount*2} — الأيدي ${doorCount} — الزوايا ${8 + doorCount*4}</div>
+    <div>ملخص: الأبواب ${doorCount} — الفصالات ${hinges} — الأيدي ${handles} — الزوايا ${angles}</div>
   `;
   resultsDiv.appendChild(item);
 }
@@ -130,7 +130,6 @@ function addFrame(){
   if(w<=0||h<=0){ alert("❌ أدخل قياسات صحيحة"); return; }
 
   let lastDoors = parseInt(document.getElementById("lastSectionDoors").value);
-
   let rows=document.querySelectorAll(".divider-row");
   let dividers=[];
   rows.forEach(r=>{
@@ -146,25 +145,35 @@ function addFrame(){
   dividers.forEach((d,i)=>{
     let sectionWidth = d.position-lastPos-(i>0?2.7:0);
     let doorWidth = (d.doors===1)?sectionWidth-3:(sectionWidth-4)/2;
-    sectionDetails += `المقطع ${i+1}: عرض ${sectionWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم — ${d.doors} باب(أبواب) — أبعاد الميلامين لكل باب: عرض ${(doorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم — فصالات 2 / يد 1 — 4 زوايا لكل باب<br>`;
+    sectionDetails += `
+<h4>🚪 المقطع ${i+1}</h4>
+- أبعاد المقطع: عرض ${sectionWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم<br>
+- عدد الأبواب: ${d.doors}<br>
+- أبعاد كل باب: عرض ${(doorWidth).toFixed(1)} × ارتفاع ${(doorHeight).toFixed(1)} سم<br>
+- ميلامين الباب: عرض ${(doorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم<br>
+- فصالات 2 / يد 1 — 4 زوايا لكل باب
+`;
     lastPos=d.position;
   });
 
   let remainingWidth = w-lastPos-(dividers.length>0?2.7:0);
   let lastDoorWidth = (lastDoors===1)?remainingWidth-3:(remainingWidth-4)/2;
-  sectionDetails += `المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم — ${lastDoors} باب(أبواب) — أبعاد الميلامين لكل باب: عرض ${(lastDoorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم — فصالات 2 / يد 1 — 4 زوايا لكل باب<br>`;
+  sectionDetails += `
+<h4>🚪 المقطع ${dividers.length+1} (آخر)</h4>
+- أبعاد المقطع: عرض ${remainingWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم<br>
+- عدد الأبواب: ${lastDoors}<br>
+- أبعاد كل باب: عرض ${lastDoorWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم<br>
+- ميلامين الباب: عرض ${(lastDoorWidth-11).toFixed(1)} × ارتفاع ${(doorHeight-11).toFixed(1)} سم<br>
+- فصالات 2 / يد 1 — 4 زوايا لكل باب
+`;
 
   let totalDoors = dividers.reduce((sum,d)=>sum+d.doors,0)+lastDoors;
-  let summary="عدد القواطع: "+dividers.length+" — ";
-  summary+="مسافات القواطع: ["+dividers.map(d=>d.position).join(", ")+"] — ";
-  summary+="عدد أبواب كل مقطع: ["+dividers.map(d=>d.doors).join(",")+","+lastDoors+"] — ";
-  summary+="ملخص الأدوات: الأبواب "+totalDoors+" — فصالات "+(totalDoors*2)+" — الأيدي "+totalDoors+" — الزوايا "+(totalDoors*4);
+  sectionDetails += `<div>ملخص الأدوات: الأبواب ${totalDoors} — فصالات ${totalDoors*2} — الأيدي ${totalDoors} — الزوايا ${totalDoors*4}</div>`;
 
   item.innerHTML=`
     <h4>🚪 حلق سفلي</h4>
     الأبعاد: عرض ${w} × ارتفاع ${h}<br>
-    <b>تفاصيل المقاطع:</b><br>${sectionDetails}
-    <div>${summary}</div>
+    ${sectionDetails}
   `;
   resultsDiv.appendChild(item);
   document.getElementById("dividerContainer").innerHTML=""; // إعادة ضبط القواطع
