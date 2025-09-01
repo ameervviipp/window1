@@ -40,6 +40,12 @@ button { margin-top: 15px; padding: 5px 15px; cursor: pointer; }
     <label>العرض (سم): <input type="number" id="frameWidth"></label>
     <label>الارتفاع (سم): <input type="number" id="frameHeight"></label>
     <div id="dividerContainer"></div>
+    <label>عدد أبواب المقطع الأخير: 
+      <select id="lastSegmentDoors">
+        <option value="1">1 باب</option>
+        <option value="2">2 باب</option>
+      </select>
+    </label>
     <button onclick="addDividerRow()">➕ إضافة قاطع</button>
     <button onclick="addFrame()">إضافة حلق</button>
   </div>
@@ -91,7 +97,6 @@ function addCabinet() {
 }
 
 // الحلقات
-let dividerData = [];
 function addDividerRow(){
   let container=document.getElementById("dividerContainer");
   let row=document.createElement("div"); row.className="divider-row";
@@ -112,7 +117,8 @@ function addFrame(){
   let h=parseFloat(document.getElementById("frameHeight").value);
   if(w<=0||h<=0){ alert("❌ أدخل قياسات صحيحة"); return; }
 
-  // جمع بيانات القواطع
+  let lastDoors = parseInt(document.getElementById("lastSegmentDoors").value);
+
   let rows=document.querySelectorAll(".divider-row");
   let dividers=[];
   rows.forEach(r=>{
@@ -124,19 +130,29 @@ function addFrame(){
 
   let item=document.createElement("div"); item.className="item";
   let lastPos=0; let sectionDetails=""; let doorHeight=h-2.5;
+
   dividers.forEach((d,i)=>{
     let sectionWidth=d.position-lastPos-(i>0?2.7:0);
+    let perDoorWidth = sectionWidth / d.doors;
     sectionDetails+=`المقطع ${i+1}: عرض ${sectionWidth.toFixed(1)} سم × ارتفاع ${doorHeight.toFixed(1)} سم — ${d.doors} باب(أبواب)<br>`;
+    for(let j=0;j<d.doors;j++){
+      sectionDetails+=`&nbsp;&nbsp;- الباب ${j+1}: عرض ${perDoorWidth.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم<br>`;
+    }
     lastPos=d.position;
   });
+
   // المقطع الأخير بعد آخر قاطع
   let remainingWidth=w-lastPos-(dividers.length>0?2.7:0);
-  sectionDetails+=`المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} سم × ارتفاع ${doorHeight.toFixed(1)} سم — 1 باب<br>`;
+  let perDoorWidthLast = remainingWidth / lastDoors;
+  sectionDetails+=`المقطع ${dividers.length+1}: عرض ${remainingWidth.toFixed(1)} سم × ارتفاع ${doorHeight.toFixed(1)} سم — ${lastDoors} باب(أبواب)<br>`;
+  for(let j=0;j<lastDoors;j++){
+    sectionDetails+=`&nbsp;&nbsp;- الباب ${j+1}: عرض ${perDoorWidthLast.toFixed(1)} × ارتفاع ${doorHeight.toFixed(1)} سم<br>`;
+  }
 
   // ملخص القواطع
   let summary="عدد القواطع: "+dividers.length+" — ";
   summary+="مسافات القواطع: ["+dividers.map(d=>d.position).join(", ")+"] — ";
-  summary+="عدد أبواب كل مقطع: ["+dividers.map(d=>d.doors).join(", ")+"]";
+  summary+="عدد أبواب كل مقطع: ["+dividers.map(d=>d.doors).join(", ")+", "+lastDoors+"]";
 
   item.innerHTML=`
     <h4>🚪 حلق سفلي</h4>
@@ -158,3 +174,4 @@ function printResults(){
 </script>
 </body>
 </html>
+
