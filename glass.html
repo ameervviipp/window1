@@ -2,22 +2,10 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title> 7000 حاسبة أبعاد الزجاج</title>
+<title>7000 حاسبة أبعاد الزجاج</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    padding: 20px;
-    direction: rtl;
-  }
-  .calculator {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    max-width: 950px;
-    margin: auto;
-  }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; direction: rtl; }
+  .calculator { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 950px; margin: auto; }
   h2, h3 { text-align: center; }
   label { display: block; margin: 10px 0 5px; }
   input { padding: 6px; border: 1px solid #ccc; border-radius: 6px; }
@@ -70,11 +58,11 @@
           <th>نوع الزجاج</th>
           <th>العرض (سم)</th>
           <th>الارتفاع (سم)</th>
+          <th>العدد</th>
           <th>ملاحظات</th>
         </tr>
       </thead>
-      <tbody>
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
   <button onclick="printResults()">🖨️ طباعة النتائج</button>
@@ -114,6 +102,7 @@ function calculateAll() {
       <td>${glassType}</td>
       <td>${newW.toFixed(2)}</td>
       <td>${newH.toFixed(2)}</td>
+      <td>2</td>
       <td></td>
     `;
     counter++;
@@ -134,6 +123,7 @@ function addManual() {
     <td>${manualType}</td>
     <td>${w.toFixed(2)}</td>
     <td>${h.toFixed(2)}</td>
+    <td>1</td>
     <td></td>
   `;
   counter++;
