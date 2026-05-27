@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -241,24 +243,24 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>عجال درف (جوز)</td>
-                            <td id="acc_wheels" class="res-highlight">2</td>
-                            <td>جوز</td>
+                            <td>عجال</td>
+                            <td id="acc_wheels" class="res-highlight">6</td>
+                            <td>عجل</td>
                         </tr>
                         <tr>
-                            <td>أقفال (سنترال)</td>
-                            <td id="acc_locks" class="res-highlight">1</td>
+                            <td>سكرة</td>
+                            <td id="acc_locks" class="res-highlight">2</td>
                             <td>قطع</td>
                         </tr>
                         <tr>
                             <td>فرشاة مانع غبار</td>
-                            <td id="acc_brush" class="res-highlight">--</td>
+                            <td id="acc_brush" class="res-highlight">4</td>
                             <td>متر طولي</td>
                         </tr>
                         <tr>
-                            <td>سيلكون إغلاق</td>
-                            <td id="acc_silicon" class="res-highlight">--</td>
-                            <td>علبة</td>
+                            <td>زوايا البشا </td>
+                            <td id="acc_silicon" class="res-highlight">4</td>
+                            <td>زاوية</td>
                         </tr>
                     </tbody>
                 </table>
@@ -339,14 +341,14 @@ function setWindowType(type) {
         document.getElementById('btn_normal').classList.add('active');
         badge.innerText = "الوضع الحالي: شباك عادي"; badge.style.background = "var(--accent-blue)";
         shutterBlock.style.display = 'none';
-        diagTitle.innerText = "📐 كروكي الشباك العادي";
+        diagTitle.innerText = "📐  الشباك العادي";
         arrowBox.style.height = "140px";
     } else {
         var btn = document.getElementById('btn_shutter');
         btn.classList.add('active', 'shutter');
         badge.innerText = "الوضع الحالي: مع أباجور"; badge.style.background = "var(--accent-orange)";
         shutterBlock.style.display = 'block';
-        diagTitle.innerText = "📐 كروكي الشباك مع أباجور";
+        diagTitle.innerText = "📐  الشباك مع أباجور";
         arrowBox.style.height = "175px";
     }
     renderTable(); runCalculation();
